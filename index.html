@@ -19,17 +19,28 @@
       <input id="vehicleNumber" type="text" placeholder="หมายเลขรถ" class="w-full p-2 border rounded" />
       <input id="startLocation" type="text" placeholder="สถานที่เริ่มต้น" class="w-full p-2 border rounded" />
       <input id="endLocation" type="text" placeholder="สถานที่ปลายทาง" class="w-full p-2 border rounded" />
-      
+
+      <!-- ปุ่มเริ่ม -->
       <button id="startButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">เริ่ม</button>
 
+      <!-- ตัวจับเวลา -->
+      <div id="timer" class="hidden text-center text-lg text-gray-700">
+        เวลาที่ใช้ไป: <span id="time">0</span> วินาที
+      </div>
+
+      <!-- ปุ่มยกเลิก -->
+      <button id="cancelButton" class="hidden w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">
+        ยกเลิก
+      </button>
+
       <!-- ปุ่มไปหน้า dashboard -->
-      <a href="Dashboard.html" class="block text-center mt-2 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+      <a href="dashboard.html" class="block text-center mt-2 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
         ดูข้อมูลย้อนหลัง
       </a>
     </div>
   </div>
 
-  <script src="database.js"></script>
-  <script src="script.js"></script>
+  <script src="database.js" type="module"></script>
+  <script src="script.js" type="module"></script>
 </body>
 </html>
