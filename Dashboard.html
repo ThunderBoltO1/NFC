@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ข้อมูลย้อนหลัง</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">ข้อมูลย้อนหลังจาก Firestore</h1>
+    
+    <div class="overflow-x-auto bg-white rounded-xl shadow p-4">
+      <table class="min-w-full table-auto border-collapse">
+        <thead>
+          <tr class="bg-blue-100 text-left">
+            <th class="p-2 border">#</th>
+            <th class="p-2 border">รหัสพนักงาน</th>
+            <th class="p-2 border">ชื่อ</th>
+            <th class="p-2 border">นามสกุล</th>
+            <th class="p-2 border">หมายเลขรถ</th>
+            <th class="p-2 border">สถานที่เริ่มต้น</th>
+            <th class="p-2 border">สถานที่ปลายทาง</th>
+            <th class="p-2 border">เวลา</th>
+          </tr>
+        </thead>
+        <tbody id="data-table" class="text-sm"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

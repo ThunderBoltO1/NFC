@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ฟอร์มบันทึกข้อมูลพนักงาน</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+    <h2 class="text-xl font-bold mb-4 text-center text-blue-600">ฟอร์มรับงาน</h2>
+    
+    <div class="space-y-4">
+      <input id="employeeId" type="text" placeholder="รหัสพนักงาน" class="w-full p-2 border rounded" />
+      <input id="firstName" type="text" placeholder="ชื่อ" class="w-full p-2 border rounded" />
+      <input id="lastName" type="text" placeholder="นามสกุล" class="w-full p-2 border rounded" />
+      <input id="vehicleNumber" type="text" placeholder="หมายเลขรถ" class="w-full p-2 border rounded" />
+      <input id="startLocation" type="text" placeholder="สถานที่เริ่มต้น" class="w-full p-2 border rounded" />
+      <input id="endLocation" type="text" placeholder="สถานที่ปลายทาง" class="w-full p-2 border rounded" />
+      
+      <button id="startButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">เริ่ม</button>
+
+      <!-- ปุ่มไปหน้า dashboard -->
+      <a href="dashboard.html" class="block text-center mt-2 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+        ดูข้อมูลย้อนหลัง
+      </a>
+    </div>
+  </div>
+
+  <script src="database.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
