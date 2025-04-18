@@ -10,7 +10,21 @@ const cancelButton = document.getElementById('cancelButton');
 const timerDiv = document.getElementById('timer');
 const timeSpan = document.getElementById('time');
 
+if (!startButton) {
+  console.error('ไม่พบ startButton ใน DOM');
+}
+if (!cancelButton) {
+  console.error('ไม่พบ cancelButton ใน DOM');
+}
+if (!timerDiv) {
+  console.error('ไม่พบ timerDiv ใน DOM');
+}
+if (!timeSpan) {
+  console.error('ไม่พบ timeSpan ใน DOM');
+}
+
 function resetUI() {
+  console.log('resetUI called');
   startButton.textContent = 'เริ่ม';
   startButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
   startButton.classList.add('bg-green-500', 'hover:bg-green-600');
@@ -23,6 +37,7 @@ function resetUI() {
 }
 
 startButton?.addEventListener('click', async function () {
+  console.log('startButton clicked, current text:', startButton.textContent);
   if (startButton.textContent === 'เริ่ม') {
     seconds = 0;
     timeSpan.textContent = seconds;
@@ -35,10 +50,11 @@ startButton?.addEventListener('click', async function () {
       seconds++;
       timeSpan.textContent = seconds;
     }, 1000);
+    console.log('Timer started');
   } else {
     clearInterval(timer);
     startButton.disabled = true;
-
+    console.log('Timer stopped, preparing to save data');
     const data = {
       employeeId: document.getElementById("employeeId").value,
       firstName: document.getElementById("firstName").value,
@@ -49,7 +65,7 @@ startButton?.addEventListener('click', async function () {
       travelTimeSeconds: seconds,
       timestamp: serverTimestamp()
     };
-
+    console.log('Data to save:', data);
     try {
       await addDoc(collection(db, "jobs"), data);
       alert("บันทึกข้อมูลสำเร็จ");
@@ -62,5 +78,10 @@ startButton?.addEventListener('click', async function () {
   }
 });
 
-cancelButton?.addEventListener('click', resetUI);
+cancelButton?.addEventListener('click', function() {
+  console.log('cancelButton clicked');
+  resetUI();
+});
+
 resetUI();
+console.log('Script loaded and initialized');
