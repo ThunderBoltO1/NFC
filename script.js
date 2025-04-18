@@ -37,8 +37,10 @@ function resetUI() {
 }
 
 startButton?.addEventListener('click', async function () {
-  console.log('startButton clicked, current text:', startButton.textContent);
+  console.log('startButton clicked');  // เพิ่ม log นี้
+  console.log('current text:', startButton.textContent); // เช็คว่า startButton text เป็น 'เริ่ม' หรือไม่
   if (startButton.textContent === 'เริ่ม') {
+    console.log('Starting timer...');
     seconds = 0;
     timeSpan.textContent = seconds;
     timerDiv?.classList.remove('hidden');
@@ -52,9 +54,9 @@ startButton?.addEventListener('click', async function () {
     }, 1000);
     console.log('Timer started');
   } else {
+    console.log('Stopping timer...');
     clearInterval(timer);
     startButton.disabled = true;
-    console.log('Timer stopped, preparing to save data');
     const data = {
       employeeId: document.getElementById("employeeId").value,
       firstName: document.getElementById("firstName").value,
