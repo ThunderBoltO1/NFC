@@ -1,6 +1,8 @@
+// database.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBTV8M7e_y8zjHR_8eFv2B6Zvnj4ZikDQI",
   authDomain: "nfc-c0d91.firebaseapp.com",
@@ -11,11 +13,12 @@ const firebaseConfig = {
   measurementId: "G-VVBDNKNMQ4"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firestore and export
 const db = getFirestore(app);
-
 export { db };
-
 // เพิ่ม event listener ให้ปุ่ม (กรณีใช้ฟอร์มในหน้า dashboard ด้วย)
 document.getElementById("startButton")?.addEventListener("click", async () => {
   const data = {
