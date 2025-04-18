@@ -1,18 +1,14 @@
 {
-    "builds": [
-      {
-        "src": "index.html",
-        "use": "@vercel/static"
-      },
-      {
-        "src": "dashboard.html",
-        "use": "@vercel/static"
-      }
-    ],
-    "rewrites": [
-      {
-        "source": "/dashboard",
-        "destination": "/dashboard.html"
-      }
-    ]
-  }
+  "builds": [
+    {
+      "src": "**",
+      "use": "@vercel/static"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    }
+  ]
+}
