@@ -1,33 +1,38 @@
-// dashboard.js
 import { db } from './database.js';
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 async function loadJobs() {
-  const table = document.getElementById("data-table");
-  table.innerHTML = "";
+  const tableBody = document.getElementById("dataBody");
+  tableBody.innerHTML = "";
 
   try {
-    const querySnapshot = await getDocs(collection(db, "jobs"));
-    let index = 1;
+    const q = query(collection(db, "jobs"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      const date = data.timestamp?.toDate().toLocaleString('th-TH') || '-';
       const row = `
-        <tr>
-          <td class="p-2 border">${index++}</td>
-          <td class="p-2 border">${data.employeeId || "-"}</td>
-          <td class="p-2 border">${data.firstName || "-"}</td>
-          <td class="p-2 border">${data.lastName || "-"}</td>
-          <td class="p-2 border">${data.vehicleNumber || "-"}</td>
-          <td class="p-2 border">${data.startLocation || "-"}</td>
-          <td class="p-2 border">${data.endLocation || "-"}</td>
-          <td class="p-2 border">${data.travelTimeSeconds || 0} วินาที</td>
+        <tr class="hover:bg-gray-100">
+          <td class="p-2 border">${data.employeeId || '-'}</td>
+          <td class="p-2 border">${data.firstName || '-'}</td>
+          <td class="p-2 border">${data.lastName || '-'}</td>
+          <td class="p-2 border">${data.vehicleNumber || '-'}</td>
+          <td class="p-2 border">${data.startLocation || '-'}</td>
+          <td class="p-2 border">${data.endLocation || '-'}</td>
+          <td class="p-2 border">${data.travelTimeSeconds || 0}</td>
+          <td class="p-2 border">${date}</td>
         </tr>
       `;
-      table.innerHTML += row;
+      tableBody.innerHTML += row;
     });
   } catch (error) {
-    console.error("โหลดข้อมูลล้มเหลว:", error);
+    console.error("❌ โหลดข้อมูลล้มเหลว:", error);
   }
 }
 

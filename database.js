@@ -1,6 +1,11 @@
 // database.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -19,7 +24,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore and export
 const db = getFirestore(app);
 export { db };
-//ปุ่มบันทึกเวลา
+
+// ปุ่มบันทึกเวลา
 document.getElementById("startButton")?.addEventListener("click", async () => {
   const data = {
     employeeId: document.getElementById("employeeId").value,
@@ -39,7 +45,8 @@ document.getElementById("startButton")?.addEventListener("click", async () => {
     console.error(error);
   }
 });
-//ฟังชั่นเพิ่มพนักงาน
+
+// ฟังชั่นเพิ่มพนักงาน
 document.getElementById("addEmployeeButton")?.addEventListener("click", async () => {
   const employeeData = {
     employeeId: document.getElementById("newEmployeeId").value,
