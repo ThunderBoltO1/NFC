@@ -11,7 +11,7 @@ document.getElementById("addEmployeeButton")?.addEventListener("click", async ()
   };
 
   try {
-    await addDoc(collection(db, "employees"), employeeData);
+    await addDoc(collection(db, "employee"), employeeData);
     alert("✅ เพิ่มพนักงานเรียบร้อยแล้ว!");
     document.querySelectorAll("input").forEach(input => (input.value = ""));
   } catch (error) {
