@@ -9,6 +9,10 @@
     {
       "source": "/dashboard",
       "destination": "/dashboard.html"
+    },
+    {
+      "source": "/add-employee",
+      "destination": "/add-employee.html"
     }
   ]
 }
