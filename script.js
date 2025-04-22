@@ -1,46 +1,42 @@
-// script.js
 import { db } from './database.js';
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-let timer;
-let seconds = 0;
-
+// DOM elements
 const startButton = document.getElementById('startButton');
-const cancelButton = document.getElementById('cancelButton');
-const timerDiv = document.getElementById('timer');
 const timeSpan = document.getElementById('time');
+const timerDiv = document.getElementById('timer');
+const cancelButton = document.getElementById('cancelButton');
 
-if (!startButton) {
-  console.error('ไม่พบ startButton ใน DOM');
-}
-if (!cancelButton) {
-  console.error('ไม่พบ cancelButton ใน DOM');
-}
-if (!timerDiv) {
-  console.error('ไม่พบ timerDiv ใน DOM');
-}
-if (!timeSpan) {
-  console.error('ไม่พบ timeSpan ใน DOM');
-}
+// Variables
+let seconds = 0;
+let timer;
 
+// Function to reset UI to initial state
 function resetUI() {
-  console.log('resetUI called');
+  clearInterval(timer);
+  seconds = 0;
+  timeSpan.textContent = seconds;
+  timerDiv?.classList.add('hidden');
   startButton.textContent = 'เริ่ม';
   startButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
   startButton.classList.add('bg-green-500', 'hover:bg-green-600');
-  timerDiv?.classList.add('hidden');
-  cancelButton?.classList.add('hidden');
-  seconds = 0;
-  timeSpan.textContent = seconds;
-  clearInterval(timer);
   startButton.disabled = false;
+  cancelButton?.classList.add('hidden');
 }
 
+// Cancel button event listener
+cancelButton?.addEventListener('click', function() {
+  resetUI();
+});
+
 startButton?.addEventListener('click', async function () {
-  console.log('startButton clicked');  // เพิ่ม log นี้
-  console.log('current text:', startButton.textContent); // เช็คว่า startButton text เป็น 'เริ่ม' หรือไม่
+  console.log('startButton clicked, current text:', startButton.textContent);
   if (startButton.textContent === 'เริ่ม') {
-    console.log('Starting timer...');
+    // เริ่มนับเวลา
     seconds = 0;
     timeSpan.textContent = seconds;
     timerDiv?.classList.remove('hidden');
@@ -54,9 +50,12 @@ startButton?.addEventListener('click', async function () {
     }, 1000);
     console.log('Timer started');
   } else {
-    console.log('Stopping timer...');
+    // กดปุ่มถึงที่หมาย
     clearInterval(timer);
     startButton.disabled = true;
+    console.log('Timer stopped, preparing to save data');
+    
+    // เก็บข้อมูลการเดินทางตอนถึงที่หมาย
     const data = {
       employeeId: document.getElementById("employeeId").value,
       firstName: document.getElementById("firstName").value,
@@ -64,10 +63,11 @@ startButton?.addEventListener('click', async function () {
       vehicleNumber: document.getElementById("vehicleNumber").value,
       startLocation: document.getElementById("startLocation").value,
       endLocation: document.getElementById("endLocation").value,
-      travelTimeSeconds: seconds,
-      timestamp: serverTimestamp()
+      travelTimeSeconds: seconds, // บันทึกเวลาที่ใช้เดินทาง
+      timestamp: serverTimestamp() // เวลาที่บันทึก
     };
-    console.log('Data to save:', data);
+
+    // บันทึกข้อมูลลง Firestore
     try {
       await addDoc(collection(db, "jobs"), data);
       alert("บันทึกข้อมูลสำเร็จ");
@@ -79,11 +79,3 @@ startButton?.addEventListener('click', async function () {
     }
   }
 });
-
-cancelButton?.addEventListener('click', function() {
-  console.log('cancelButton clicked');
-  resetUI();
-});
-
-resetUI();
-console.log('Script loaded and initialized');

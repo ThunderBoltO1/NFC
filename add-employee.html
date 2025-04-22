@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>เพิ่มพนักงานใหม่</title>
-  <script type="module" src="add-employee.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
@@ -12,11 +11,11 @@
     <h2 class="text-xl font-bold mb-4 text-center text-blue-600">เพิ่มพนักงานใหม่</h2>
 
     <div class="space-y-4">
-      <input id="employeeId" type="text" placeholder="รหัสพนักงาน" class="w-full p-2 border rounded" />
-      <input id="firstName" type="text" placeholder="ชื่อ" class="w-full p-2 border rounded" />
-      <input id="lastName" type="text" placeholder="นามสกุล" class="w-full p-2 border rounded" />
+      <input id="newEmployeeId" type="text" placeholder="รหัสพนักงาน" class="w-full p-2 border rounded" />
+      <input id="newFirstName" type="text" placeholder="ชื่อ" class="w-full p-2 border rounded" />
+      <input id="newLastName" type="text" placeholder="นามสกุล" class="w-full p-2 border rounded" />
       
-      <button id="saveButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+      <button id="addEmployeeButton" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
         บันทึกข้อมูลพนักงาน
       </button>
 
@@ -25,7 +24,7 @@
       </a>
     </div>
   </div>
-  <script type="module src="database.js"></script>
+  <script type="module" src="add-employee.js"></script>
 
 </body>
 </html>

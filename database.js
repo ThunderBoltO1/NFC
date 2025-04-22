@@ -23,44 +23,4 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Firestore and export
 const db = getFirestore(app);
-export { db };
-
-// ปุ่มบันทึกเวลา
-document.getElementById("startButton")?.addEventListener("click", async () => {
-  const data = {
-    employeeId: document.getElementById("employeeId").value,
-    firstName: document.getElementById("firstName").value,
-    lastName: document.getElementById("lastName").value,
-    vehicleNumber: document.getElementById("vehicleNumber").value,
-    startLocation: document.getElementById("startLocation").value,
-    endLocation: document.getElementById("endLocation").value,
-    timestamp: serverTimestamp()
-  };
-
-  try {
-    await addDoc(collection(db, "jobs"), data);
-    alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว!");
-  } catch (error) {
-    alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-    console.error(error);
-  }
-});
-
-// ฟังชั่นเพิ่มพนักงาน
-document.getElementById("addEmployeeButton")?.addEventListener("click", async () => {
-  const employeeData = {
-    employeeId: document.getElementById("newEmployeeId").value,
-    firstName: document.getElementById("newFirstName").value,
-    lastName: document.getElementById("newLastName").value,
-    timestamp: serverTimestamp()
-  };
-
-  try {
-    await addDoc(collection(db, "employees"), employeeData);
-    alert("✅ เพิ่มพนักงานเรียบร้อยแล้ว!");
-    document.querySelectorAll("input").forEach(input => (input.value = ""));
-  } catch (error) {
-    console.error("❌ เกิดข้อผิดพลาดในการเพิ่มพนักงาน:", error);
-    alert("❌ ไม่สามารถเพิ่มพนักงานได้");
-  }
-});
+export { db, collection, addDoc, serverTimestamp };
