@@ -2,7 +2,7 @@
 import { db, collection, addDoc, serverTimestamp } from './database.js';
 
 // ฟังชั่นเพิ่มพนักงาน
-document.getElementById("addEmployeeButton")?.addEventListener("click", async () => {
+document.getElementById("saveEmployeeButton")?.addEventListener("click", async () => {
   const employeeData = {
     employeeId: document.getElementById("newEmployeeId").value,
     firstName: document.getElementById("newFirstName").value,
