@@ -19,10 +19,10 @@ async function loadJobs() {
       const date = data.timestamp?.toDate().toLocaleString('th-TH') || '-';
       const row = `
         <tr class="hover:bg-gray-100">
+        <td class="p-2 border">${data.vehicleNumber || '-'}</td>
           <td class="p-2 border">${data.employeeId || '-'}</td>
           <td class="p-2 border">${data.firstName || '-'}</td>
           <td class="p-2 border">${data.lastName || '-'}</td>
-          <td class="p-2 border">${data.vehicleNumber || '-'}</td>
           <td class="p-2 border">${data.startLocation || '-'}</td>
           <td class="p-2 border">${data.endLocation || '-'}</td>
           <td class="p-2 border">${data.travelTimeSeconds || 0}</td>
