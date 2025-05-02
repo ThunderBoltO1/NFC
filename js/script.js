@@ -2,7 +2,10 @@ import { db } from './database.js';
 import {
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  where,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // DOM elements
@@ -10,6 +13,9 @@ const startButton = document.getElementById('startButton');
 const timeSpan = document.getElementById('time');
 const timerDiv = document.getElementById('timer');
 const cancelButton = document.getElementById('cancelButton');
+const employeeIdInput = document.getElementById('employeeId');
+const firstNameInput = document.getElementById('firstName');
+const lastNameInput = document.getElementById('lastName');
 
 // Variables
 let seconds = 0;
@@ -27,6 +33,56 @@ function resetUI() {
   startButton.disabled = false;
   cancelButton?.classList.add('hidden');
 }
+
+// Function to fetch employee data based on employee ID
+async function fetchEmployeeData(employeeId) {
+  if (!employeeId) return;
+  
+  try {
+    const q = query(collection(db, "employee"), where("employeeId", "==", employeeId));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      // Get the first matching document
+      const employeeData = querySnapshot.docs[0].data();
+      
+      // Update the form fields
+      firstNameInput.value = employeeData.firstName || '';
+      lastNameInput.value = employeeData.lastName || '';
+      
+      // Make name fields read-only
+      firstNameInput.readOnly = true;
+      lastNameInput.readOnly = true;
+      
+      // Add visual indication that these fields are auto-filled
+      firstNameInput.classList.add('bg-gray-100');
+      lastNameInput.classList.add('bg-gray-100');
+    } else {
+      console.log("ไม่พบข้อมูลพนักงานสำหรับรหัส:", employeeId);
+      // Reset name fields if no employee found
+      firstNameInput.value = '';
+      lastNameInput.value = '';
+      firstNameInput.readOnly = false;
+      lastNameInput.readOnly = false;
+      firstNameInput.classList.remove('bg-gray-100');
+      lastNameInput.classList.remove('bg-gray-100');
+    }
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลพนักงาน:", error);
+  }
+}
+
+// Add event listener to employee ID input
+employeeIdInput?.addEventListener('blur', function() {
+  fetchEmployeeData(this.value);
+});
+
+// Also fetch when user presses Enter in the employee ID field
+employeeIdInput?.addEventListener('keyup', function(event) {
+  if (event.key === 'Enter') {
+    fetchEmployeeData(this.value);
+  }
+});
 
 // Cancel button event listener
 cancelButton?.addEventListener('click', function() {
@@ -73,6 +129,11 @@ startButton?.addEventListener('click', async function () {
       alert("บันทึกข้อมูลสำเร็จ");
       resetUI();
       document.querySelectorAll("input").forEach(input => input.value = "");
+      // Reset the read-only and styling on name fields
+      firstNameInput.readOnly = false;
+      lastNameInput.readOnly = false;
+      firstNameInput.classList.remove('bg-gray-100');
+      lastNameInput.classList.remove('bg-gray-100');
     } catch (error) {
       console.error("เกิดข้อผิดพลาดในการบันทึก: ", error);
       alert("บันทึกไม่สำเร็จ");
