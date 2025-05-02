@@ -212,7 +212,7 @@ function updateTable() {
   if (filteredData.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="7" class="p-4 text-center text-gray-500">ไม่พบข้อมูล</td>
+        <td colspan="7" class="px-3 py-4 text-center text-gray-500">ไม่พบข้อมูล</td>
       </tr>
     `;
     return;
@@ -224,25 +224,25 @@ function updateTable() {
     const date = data.timestamp?.toDate().toLocaleString('th-TH') || '-';
     
     const row = document.createElement('tr');
-    row.className = 'hover-row'; // Add hover effect class
+    row.className = 'hover:bg-blue-50 transition-colors duration-150';
     
     row.innerHTML = `
-      <td class="p-3 border">${data.employeeId || '-'}</td>
-      <td class="p-3 border">${(data.firstName || '-')} ${(data.lastName || '')}</td>
-      <td class="p-3 border">${data.vehicleNumber || '-'}</td>
-      <td class="p-3 border">
+      <td class="px-3 py-3 border">${data.employeeId || '-'}</td>
+      <td class="px-3 py-3 border">${(data.firstName || '-')} ${(data.lastName || '')}</td>
+      <td class="px-3 py-3 border">${data.vehicleNumber || '-'}</td>
+      <td class="px-3 py-3 border">
         <span class="text-blue-600"><i class="fas fa-map-marker-alt mr-1"></i>${data.startLocation || '-'}</span>
         <span class="mx-2">→</span>
         <span class="text-green-600"><i class="fas fa-flag-checkered mr-1"></i>${data.endLocation || '-'}</span>
       </td>
-      <td class="p-3 border text-center font-medium ${getTimeColorClass(data.travelTimeSeconds)}">${data.travelTimeSeconds || 0}</td>
-      <td class="p-3 border text-center">${date}</td>
-      <td class="p-3 border text-center">
+      <td class="px-3 py-3 border text-center font-medium ${getTimeColorClass(data.travelTimeSeconds)}">${data.travelTimeSeconds || 0}</td>
+      <td class="px-3 py-3 border text-center">${date}</td>
+      <td class="px-3 py-3 border text-center">
         <div class="flex justify-center space-x-2">
-          <button class="view-btn bg-blue-500 text-white p-1 rounded hover:bg-blue-600" data-id="${data.id}" title="ดูรายละเอียด">
+          <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600" data-id="${data.id}" title="ดูรายละเอียด">
             <i class="fas fa-eye"></i>
           </button>
-          <button class="delete-btn bg-red-500 hover:bg-red-600 text-white p-1 rounded transition duration-200" data-id="${data.id}" title="ลบข้อมูล">
+          <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded transition duration-200" data-id="${data.id}" title="ลบข้อมูล">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -280,7 +280,7 @@ function updatePagination() {
   
   for (let i = startPage; i <= endPage; i++) {
     const pageButton = document.createElement('button');
-    pageButton.className = `px-3 py-1 border rounded transition duration-200 btn-effect ${i === currentPage ? 'page-active' : 'bg-gray-200 hover:bg-gray-300'}`;
+    pageButton.className = `px-3 py-1 border rounded ${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} transition duration-200`;
     pageButton.textContent = i;
     pageButton.addEventListener('click', function() {
       currentPage = i;
