@@ -224,7 +224,7 @@ function updateTable() {
     const date = data.timestamp?.toDate().toLocaleString('th-TH') || '-';
     
     const row = document.createElement('tr');
-    row.className = 'hover:bg-blue-50 transition-colors duration-150';
+    row.className = 'hover-row'; // Add hover effect class
     
     row.innerHTML = `
       <td class="p-3 border">${data.employeeId || '-'}</td>
@@ -242,7 +242,7 @@ function updateTable() {
           <button class="view-btn bg-blue-500 text-white p-1 rounded hover:bg-blue-600" data-id="${data.id}" title="ดูรายละเอียด">
             <i class="fas fa-eye"></i>
           </button>
-          <button class="delete-btn bg-red-500 text-white p-1 rounded hover:bg-red-600" data-id="${data.id}" title="ลบข้อมูล">
+          <button class="delete-btn bg-red-500 hover:bg-red-600 text-white p-1 rounded transition duration-200" data-id="${data.id}" title="ลบข้อมูล">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -280,11 +280,12 @@ function updatePagination() {
   
   for (let i = startPage; i <= endPage; i++) {
     const pageButton = document.createElement('button');
-    pageButton.className = `px-3 py-1 border rounded ${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`;
+    pageButton.className = `px-3 py-1 border rounded transition duration-200 btn-effect ${i === currentPage ? 'page-active' : 'bg-gray-200 hover:bg-gray-300'}`;
     pageButton.textContent = i;
     pageButton.addEventListener('click', function() {
       currentPage = i;
       updateTable();
+      updatePagination();
     });
     pageNumbers.appendChild(pageButton);
   }
