@@ -50,18 +50,30 @@ async function populateLocationDropdown() {
   }
 
   try {
-    // ดึงข้อมูลสถานที่จาก Firebase
-    const querySnapshot = await getDocs(collection(db, "location"));
+    // เพิ่ม placeholder option
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = '-- เลือกสถานที่ --';
+    placeholderOption.selected = true;
+    placeholderOption.disabled = true;
+    endLocationSelect.appendChild(placeholderOption);
+
+    // ดึงข้อมูลสถานที่จาก Firebase และเรียงตามชื่อ
+    const querySnapshot = await getDocs(query(collection(db, "location"), orderBy("name")));
+    
     querySnapshot.forEach(doc => {
       const locationData = doc.data();
       const option = document.createElement('option');
-      option.value = doc.id; // ใช้ ID เป็นค่า value
-      option.textContent = locationData.name; // แสดงชื่อสถานที่
-      option.dataset.locationData = JSON.stringify(locationData); // เก็บข้อมูลสถานที่ทั้งหมด
+      option.value = doc.id;
+      option.textContent = locationData.name;
+      option.dataset.locationData = JSON.stringify(locationData);
       endLocationSelect.appendChild(option);
     });
   } catch (error) {
     console.error("❌ ดึงข้อมูลสถานที่ล้มเหลว:", error);
+    // แสดง error message ให้ user เห็น
+    const locationError = document.getElementById('locationError');
+    showError(locationError, 'ไม่สามารถดึงข้อมูลสถานที่ได้ กรุณาลองใหม่อีกครั้ง');
   }
 }
 
@@ -311,7 +323,7 @@ async function endTimer() {
     resetUI();
   }
 }
- 
+
 // Cancel the timer
 function cancelTimer() {
   if (confirm('คุณต้องการยกเลิกการจับเวลาใช่หรือไม่?')) {
