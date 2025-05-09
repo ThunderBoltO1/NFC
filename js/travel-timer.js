@@ -6,22 +6,88 @@ import {
   getDocs,
   query,
   where,
-  serverTimestamp
+  serverTimestamp,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Global variables
 let timerInterval;
 let startTime;
 let vehicleNumber = Math.floor(Math.random() * 9000) + 1000; // Random 4-digit number
+let locationOptions = [
+
+];
 
 // Initialize the page
-document.addEventListener('DOMContentLoaded', function() {
-  // Set random vehicle number
-  document.getElementById('vehicleNumber').value = vehicleNumber;
-  
-  // Set up event listeners
-  setupEventListeners();
+document.addEventListener('DOMContentLoaded', async function() {
+  await initializePage();
 });
+
+async function initializePage() {
+  document.getElementById('vehicleNumber').value = vehicleNumber;
+  populateLocationDropdown();
+  await getLastEndLocation();
+  setupEventListeners();
+  updateStartButtonText();
+}
+
+function updateStartButtonText() {
+  const startButton = document.getElementById('startButton');
+  startButton.innerHTML = `
+    <i class="fas fa-play mr-2" aria-hidden="true"></i>
+    <span>เริ่มจับเวลา</span>
+  `;
+}
+
+// Populate the endLocation dropdown with options
+async function populateLocationDropdown() {
+  const endLocationSelect = document.getElementById('endLocation');
+  
+  // Clear existing options except the first one
+  while (endLocationSelect.options.length > 1) {
+    endLocationSelect.remove(1);
+  }
+
+  try {
+    // Fetch locations from Firebase
+    const querySnapshot = await getDocs(collection(db, "location"));
+    querySnapshot.forEach(doc => {
+      const location = doc.data().name; // Assuming each document has a 'name' field
+      const option = document.createElement('option');
+      option.value = location;
+      option.textContent = location;
+      endLocationSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("❌ ดึงข้อมูลสถานที่ล้มเหลว:", error);
+  }
+}
+
+// Get the last endLocation from Firebase to use as startLocation
+async function getLastEndLocation() {
+  try {
+    // Get the most recent job entry
+    const q = query(
+      collection(db, "jobs"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const lastJob = querySnapshot.docs[0].data();
+      
+      // Set the startLocation to the last endLocation
+      if (lastJob.endLocation) {
+        document.getElementById('startLocation').value = lastJob.endLocation;
+      }
+    }
+  } catch (error) {
+    console.error("❌ ดึงข้อมูลตำแหน่งล่าสุดล้มเหลว:", error);
+  }
+}
 
 // Set up all event listeners
 function setupEventListeners() {
@@ -44,45 +110,55 @@ function setupEventListeners() {
 // Fetch employee data when employee ID is entered
 async function fetchEmployeeData() {
   const employeeId = document.getElementById('employeeId').value.trim();
+  const invalidFeedback = document.querySelector('.invalid-feedback');
   
   if (!employeeId) {
     resetEmployeeFields();
+    showError(invalidFeedback, 'กรุณากรอกรหัสพนักงาน');
     return;
   }
-  
+
   try {
     const q = query(collection(db, "employee"), where("employeeId", "==", employeeId));
     const querySnapshot = await getDocs(q);
     
     if (querySnapshot.empty) {
       resetEmployeeFields();
+      showError(invalidFeedback, 'ไม่พบข้อมูลพนักงาน');
       return;
     }
-    
-    // Get the first matching employee
+
+    invalidFeedback.classList.add('hidden');
     const employeeData = querySnapshot.docs[0].data();
-    
-    // Update the form fields
-    document.getElementById('firstName').value = employeeData.firstName || '';
-    document.getElementById('lastName').value = employeeData.lastName || '';
-    
-    // Add visual indicator that data was loaded
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    
-    // Flash animation to show data was loaded
-    [firstNameInput, lastNameInput].forEach(input => {
-      input.classList.add('bg-green-50');
-      setTimeout(() => {
-        input.classList.remove('bg-green-50');
-        input.classList.add('bg-gray-100');
-      }, 500);
-    });
+    updateEmployeeFields(employeeData);
     
   } catch (error) {
     console.error("❌ ดึงข้อมูลพนักงานล้มเหลว:", error);
     resetEmployeeFields();
+    showError(invalidFeedback, 'เกิดข้อผิดพลาดในการดึงข้อมูล');
   }
+}
+
+function showError(element, message) {
+  element.textContent = message;
+  element.classList.remove('hidden');
+}
+
+function updateEmployeeFields(data) {
+  const fields = ['firstName', 'lastName'];
+  fields.forEach(field => {
+    const input = document.getElementById(field);
+    input.value = data[field] || '';
+    flashInputSuccess(input);
+  });
+}
+
+function flashInputSuccess(input) {
+  input.classList.add('bg-green-50');
+  setTimeout(() => {
+    input.classList.remove('bg-green-50');
+    input.classList.add('bg-gray-100');
+  }, 500);
 }
 
 // Reset employee fields
@@ -91,51 +167,85 @@ function resetEmployeeFields() {
   document.getElementById('lastName').value = '';
 }
 
-// Start the timer
-function startTimer() {
-  // Validate inputs
-  const employeeId = document.getElementById('employeeId').value.trim();
-  const firstName = document.getElementById('firstName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  const startLocation = document.getElementById('startLocation').value.trim();
-  const endLocation = document.getElementById('endLocation').value.trim();
+// Start timer with validation
+function startTimer(event) {
+  event.preventDefault();
   
-  if (!employeeId || !firstName || !lastName) {
-    alert('กรุณากรอกรหัสพนักงานที่ถูกต้อง');
+  const startButton = document.getElementById('startButton');
+  
+  if (!validateForm()) {
     return;
   }
-  
-  if (!startLocation) {
-    alert('กรุณากรอกสถานที่เริ่มต้น');
-    return;
+
+  startButton.disabled = true;
+  startButton.dataset.loading = 'true';
+
+  try {
+    disableFormInputs();
+    showTimer();
+    initializeTimer();
+    updateButtonsVisibility();
+  } catch (error) {
+    console.error("❌ เริ่มจับเวลาล้มเหลว:", error);
+    startButton.disabled = false;
+    startButton.dataset.loading = 'false';
   }
+}
+
+function validateForm() {
+  const invalidFeedback = document.querySelector('.invalid-feedback');
+  const locationError = document.getElementById('locationError');
+  const fields = getFormFields();
   
-  if (!endLocation) {
-    alert('กรุณากรอกสถานที่ปลายทาง');
-    return;
+  let isValid = true;
+
+  if (!fields.employeeId || !fields.firstName || !fields.lastName) {
+    showError(invalidFeedback, 'กรุณากรอกข้อมูลพนักงานให้ครบถ้วน');
+    isValid = false;
   }
-  
-  // Disable inputs
+
+  if (!fields.startLocation || !fields.endLocation) {
+    showError(locationError, 'กรุณาเลือกสถานที่ให้ครบถ้วน');
+    isValid = false;
+  }
+
+  if (fields.startLocation === fields.endLocation) {
+    showError(locationError, 'สถานที่เริ่มต้นและปลายทางต้องไม่เหมือนกัน');
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+function getFormFields() {
+  return {
+    employeeId: document.getElementById('employeeId').value.trim(),
+    firstName: document.getElementById('firstName').value.trim(),
+    lastName: document.getElementById('lastName').value.trim(),
+    startLocation: document.getElementById('startLocation').value.trim(),
+    endLocation: document.getElementById('endLocation').value
+  };
+}
+
+function disableFormInputs() {
   document.getElementById('employeeId').disabled = true;
-  document.getElementById('startLocation').disabled = true;
   document.getElementById('endLocation').disabled = true;
-  
-  // Hide start button, show destination and cancel buttons
+}
+
+function showTimer() {
+  document.getElementById('timer').classList.remove('hidden');
+}
+
+function initializeTimer() {
+  startTime = new Date();
+  timerInterval = setInterval(updateTimer, 1000);
+  updateTimer();
+}
+
+function updateButtonsVisibility() {
   document.getElementById('startButton').classList.add('hidden');
   document.getElementById('destinationButton').classList.remove('hidden');
   document.getElementById('cancelButton').classList.remove('hidden');
-  
-  // Show timer
-  document.getElementById('timer').classList.remove('hidden');
-  
-  // Set start time
-  startTime = new Date();
-  
-  // Start timer interval
-  timerInterval = setInterval(updateTimer, 1000);
-  
-  // Update timer immediately
-  updateTimer();
 }
 
 // Update the timer display
@@ -168,7 +278,7 @@ async function endTimer() {
   const firstName = document.getElementById('firstName').value.trim();
   const lastName = document.getElementById('lastName').value.trim();
   const startLocation = document.getElementById('startLocation').value.trim();
-  const endLocation = document.getElementById('endLocation').value.trim();
+  const endLocation = document.getElementById('endLocation').value;
   
   // Save to Firebase
   try {
@@ -194,7 +304,7 @@ async function endTimer() {
     resetUI();
   }
 }
-
+ 
 // Cancel the timer
 function cancelTimer() {
   if (confirm('คุณต้องการยกเลิกการจับเวลาใช่หรือไม่?')) {
@@ -208,38 +318,69 @@ function cancelTimer() {
 
 // Close success modal and reset UI
 function closeSuccessModal() {
+  // Hide success modal
   document.getElementById('successModal').classList.add('hidden');
+  
+  // Reset UI
   resetUI();
+  
+  // Get last endLocation to use as startLocation for next trip
+  getLastEndLocation();
 }
 
 // Reset UI to initial state
 function resetUI() {
-  // Clear intervals
-  clearInterval(timerInterval);
-  
-  // Reset timer display
+  clearTimerInterval();
+  resetTimerDisplay();
+  resetFormFields();
+  resetErrorMessages();
+  updateButtonStates();
+  generateNewVehicleNumber();
+}
+
+function clearTimerInterval() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+}
+
+function resetTimerDisplay() {
   document.getElementById('hours').textContent = '00';
   document.getElementById('minutes').textContent = '00';
   document.getElementById('seconds').textContent = '00';
-  
-  // Hide timer
   document.getElementById('timer').classList.add('hidden');
-  
-  // Enable inputs
+}
+
+function resetFormFields() {
   document.getElementById('employeeId').disabled = false;
-  document.getElementById('startLocation').disabled = false;
   document.getElementById('endLocation').disabled = false;
-  
-  // Clear location fields
-  document.getElementById('startLocation').value = '';
+  document.getElementById('employeeId').value = '';
+  document.getElementById('firstName').value = '';
+  document.getElementById('lastName').value = '';
   document.getElementById('endLocation').value = '';
+  resetEmployeeFields();
+}
+
+function resetErrorMessages() {
+  document.querySelector('.invalid-feedback').classList.add('hidden');
+  document.getElementById('locationError').classList.add('hidden');
+}
+
+function updateButtonStates() {
+  const startButton = document.getElementById('startButton');
+  const destinationButton = document.getElementById('destinationButton');
+  const cancelButton = document.getElementById('cancelButton');
   
-  // Show start button, hide destination and cancel buttons
-  document.getElementById('startButton').classList.remove('hidden');
-  document.getElementById('destinationButton').classList.add('hidden');
-  document.getElementById('cancelButton').classList.add('hidden');
+  startButton.disabled = false;
+  startButton.dataset.loading = 'false';
+  startButton.classList.remove('hidden');
+  destinationButton.classList.add('hidden');
+  cancelButton.classList.add('hidden');
   
-  // Generate new vehicle number
+  updateStartButtonText();
+}
+
+function generateNewVehicleNumber() {
   vehicleNumber = Math.floor(Math.random() * 9000) + 1000;
   document.getElementById('vehicleNumber').value = vehicleNumber;
 }

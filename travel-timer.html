@@ -3,12 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="ระบบจับเวลาการเดินทางสำหรับพนักงานขับรถ" />
   <title>จับเวลาการเดินทาง</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- External CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
   <style>
     body, html, input, button, select, textarea, table {
       font-family: 'IBM Plex Sans Thai', sans-serif;
@@ -16,20 +24,32 @@
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-  <!-- Navbar container -->
-  <div id="navbar-container"></div>
+  <noscript>
+    <div class="text-red-500 text-center p-4">
+      กรุณาเปิดใช้งาน JavaScript เพื่อใช้งานระบบนี้
+    </div>
+  </noscript>
 
-  <div class="container mx-auto p-4 pt-8">
+  <!-- Navbar container -->
+  <div id="navbar-container" role="navigation"></div>
+
+  <main class="container mx-auto p-4 pt-8">
     <div class="bg-white p-10 rounded-xl shadow-xl w-full max-w-md mx-auto">
-      <h2 class="text-xl font-bold mb-6 text-center text-blue-600">
-        <i class="fas fa-stopwatch mr-2"></i>จับเวลาการเดินทาง
-      </h2>
+      <!-- Form Header -->
+      <h1 class="text-xl font-bold mb-6 text-center text-blue-600">
+        <i class="fas fa-stopwatch mr-2" aria-hidden="true"></i>จับเวลาการเดินทาง
+      </h1>
       
-      <div class="space-y-4">
+      <form id="travelForm" class="space-y-4">
+        <!-- CSRF Token -->
+        <input type="hidden" name="_csrf" value="">
+        
         <!-- Vehicle Number -->
         <div class="flex justify-end">
           <div class="relative">
-            <input id="vehicleNumber" readonly type="text" class="w-24 p-4 border rounded-xl text-right font-bold text-lg bg-gray-100" />
+            <input id="vehicleNumber" readonly type="text" 
+              class="w-24 p-4 border rounded-xl text-right font-bold text-lg bg-gray-100"
+              aria-label="หมายเลขรถ" />
             <span class="absolute left-3 top-4 text-gray-500">รถ #</span>
           </div>
         </div>
@@ -59,6 +79,7 @@
               <i class="fas fa-user absolute left-3 top-3.5 text-gray-400"></i>
             </div>
           </div>
+          <div class="invalid-feedback text-red-500 text-sm hidden">กรุณากรอกข้อมูลให้ครบถ้วน</div>
         </div>
 
         <!-- Location Section -->
@@ -70,19 +91,23 @@
           
           <div class="relative mb-3">
             <input id="startLocation" type="text" placeholder="สถานที่เริ่มต้น" 
-              class="w-full pl-10 p-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+              class="w-full pl-10 p-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500" readonly />
             <i class="fas fa-map-marker-alt absolute left-3 top-3.5 text-gray-400"></i>
           </div>
           
           <div class="relative">
-            <input id="endLocation" type="text" placeholder="สถานที่ปลายทาง" 
-              class="w-full pl-10 p-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+            <select id="endLocation" 
+              class="w-full pl-10 p-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500">
+              <option value="" disabled selected>เลือกสถานที่ปลายทาง</option>
+              <!-- Options will be added dynamically -->
+            </select>
             <i class="fas fa-flag-checkered absolute left-3 top-3.5 text-gray-400"></i>
           </div>
+          <div id="locationError" class="text-red-500 text-sm hidden"></div>
         </div>
 
         <!-- Timer Display -->
-        <div id="timer" class="hidden bg-blue-100 p-4 rounded-xl text-center">
+        <div id="timer" class="hidden bg-blue-100 p-4 rounded-xl text-center" role="timer">
           <div class="text-blue-800 font-bold mb-2">เวลาที่ใช้ไป</div>
           <div class="text-3xl font-mono font-bold text-blue-900">
             <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
@@ -91,9 +116,10 @@
 
         <!-- Action Buttons -->
         <div class="space-y-3">
-          <!-- Start Button -->
-          <button id="startButton" class="w-full bg-green-500 text-white py-3 px-4 rounded-xl hover:bg-green-600 transition duration-300 flex items-center justify-center">
-            <i class="fas fa-play mr-2"></i>
+          <button id="startButton" type="submit"
+            class="w-full bg-green-500 text-white py-3 px-4 rounded-xl hover:bg-green-600 transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            data-loading="false">
+            <i class="fas fa-play mr-2" aria-hidden="true"></i>
             <span>เริ่มจับเวลา</span>
           </button>
           
@@ -109,12 +135,12 @@
             <span>ยกเลิก</span>
           </button>
         </div>
-      </div>
+      </form>
     </div>
-  </div>
+  </main>
 
   <!-- Success Modal -->
-  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50" role="dialog" aria-modal="true">
     <div class="bg-white rounded-xl p-6 max-w-md w-full">
       <div class="text-center">
         <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
@@ -129,8 +155,9 @@
     </div>
   </div>
 
-  <script type="module" src="js/database.js"></script>
-  <script type="module" src="js/travel-timer.js"></script>
-  <script type="module" src="js/navbar.js"></script>
+  <!-- Scripts -->
+  <script type="module" src="js/database.js?v=1.0"></script>
+  <script type="module" src="js/travel-timer.js?v=1.0"></script>
+  <script type="module" src="js/navbar.js?v=1.0"></script>
 </body>
 </html>
