@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มข้อมูลสถานที่</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <a href="index.html" class="flex items-center py-4">
+                            <i class="fas fa-clock text-blue-500 text-2xl mr-2"></i>
+                            <span class="font-semibold text-gray-500 text-lg">Travel Timer</span>
+                        </a>
+                    </div>
+                    <!-- Primary Navbar items -->
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="index.html" class="py-4 px-2 text-gray-500 hover:text-blue-500 transition duration-300">หน้าแรก</a>
+                        <a href="add-location.html" class="py-4 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">จัดการสถานที่</a>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="outline-none mobile-menu-button">
+                        <i class="fas fa-bars text-gray-500 text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Mobile menu -->
+            <div class="hidden mobile-menu md:hidden">
+                <ul class="">
+                    <li><a href="index.html" class="block text-sm px-2 py-4 text-gray-500 hover:bg-blue-500 hover:text-white transition duration-300">หน้าแรก</a></li>
+                    <li><a href="add-location.html" class="block text-sm px-2 py-4 bg-blue-500 text-white">จัดการสถานที่</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+            <h1 class="text-2xl font-bold mb-6 text-center">เพิ่มข้อมูลสถานที่</h1>
+            
+            <!-- Form for adding single location -->
+            <form id="locationForm" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">ชื่อสถานที่</label>
+                    <input type="text" id="name" name="name" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit"
+                        class="flex-1 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <i class="fas fa-save mr-2"></i>บันทึก
+                    </button>
+                    <button type="button" id="addSampleBtn"
+                        class="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        <i class="fas fa-plus mr-2"></i>เพิ่มข้อมูลตัวอย่าง
+                    </button>
+                </div>
+            </form>
+
+            <!-- Success message -->
+            <div id="successMessage" class="hidden mt-4 p-4 bg-green-100 text-green-700 rounded-md">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span>บันทึกข้อมูลสำเร็จ</span>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-100 text-red-700 rounded-md">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span>เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { addLocation, addSampleLocations } from './js/add-locations.js';
+
+        const form = document.getElementById('locationForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const addSampleBtn = document.getElementById('addSampleBtn');
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        // Mobile menu toggle
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const locationData = {
+                name: form.name.value.trim()
+            };
+            try {
+                await addLocation(locationData);
+                showMessage(successMessage);
+                form.reset();
+            } catch (error) {
+                showMessage(errorMessage);
+                console.error('Error:', error);
+            }
+        });
+
+        // Handle add sample data button
+        addSampleBtn.addEventListener('click', async () => {
+            try {
+                await addSampleLocations();
+                showMessage(successMessage);
+            } catch (error) {
+                showMessage(errorMessage);
+                console.error('Error:', error);
+            }
+        });
+
+        function showMessage(element) {
+            element.classList.remove('hidden');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
