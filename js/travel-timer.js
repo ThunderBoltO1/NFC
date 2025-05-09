@@ -44,19 +44,20 @@ function updateStartButtonText() {
 async function populateLocationDropdown() {
   const endLocationSelect = document.getElementById('endLocation');
   
-  // Clear existing options except the first one
+  // ล้างตัวเลือกเดิมยกเว้นตัวแรก
   while (endLocationSelect.options.length > 1) {
     endLocationSelect.remove(1);
   }
 
   try {
-    // Fetch locations from Firebase
+    // ดึงข้อมูลสถานที่จาก Firebase
     const querySnapshot = await getDocs(collection(db, "location"));
     querySnapshot.forEach(doc => {
-      const location = doc.data().name; // Assuming each document has a 'name' field
+      const locationData = doc.data();
       const option = document.createElement('option');
-      option.value = location;
-      option.textContent = location;
+      option.value = doc.id; // ใช้ ID เป็นค่า value
+      option.textContent = locationData.name; // แสดงชื่อสถานที่
+      option.dataset.locationData = JSON.stringify(locationData); // เก็บข้อมูลสถานที่ทั้งหมด
       endLocationSelect.appendChild(option);
     });
   } catch (error) {
@@ -218,12 +219,17 @@ function validateForm() {
 }
 
 function getFormFields() {
+  const endLocationSelect = document.getElementById('endLocation');
+  const selectedOption = endLocationSelect.options[endLocationSelect.selectedIndex];
+  const locationData = selectedOption ? JSON.parse(selectedOption.dataset.locationData) : null;
+
   return {
     employeeId: document.getElementById('employeeId').value.trim(),
     firstName: document.getElementById('firstName').value.trim(),
     lastName: document.getElementById('lastName').value.trim(),
     startLocation: document.getElementById('startLocation').value.trim(),
-    endLocation: document.getElementById('endLocation').value
+    endLocation: locationData ? locationData.name : '',
+    endLocationId: selectedOption ? selectedOption.value : '' // Store location ID
   };
 }
 
@@ -279,8 +285,8 @@ async function endTimer() {
   const lastName = document.getElementById('lastName').value.trim();
   const startLocation = document.getElementById('startLocation').value.trim();
   const endLocation = document.getElementById('endLocation').value;
+  const fields = getFormFields();
   
-  // Save to Firebase
   try {
     await addDoc(collection(db, "jobs"), {
       employeeId,
@@ -288,7 +294,8 @@ async function endTimer() {
       lastName,
       vehicleNumber,
       startLocation,
-      endLocation,
+      endLocation: fields.endLocation,
+      endLocationId: fields.endLocationId, // Save location ID
       travelTimeSeconds,
       timestamp: serverTimestamp()
     });
